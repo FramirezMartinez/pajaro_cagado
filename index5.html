@@ -1,0 +1,382 @@
+//vareable global
+//var palabraActual = "HOLA";
+ 
+ var ColletraCategoria = "#FF5A04";
+// Código para seleccionar categorías
+function mostrarCategorias(ctx) {
+    // Lógica para mostrar las categorías en el lienzo
+    // Por ejemplo:
+    ctx.fillStyle = ColletraCategoria;
+    ctx.font = "20px Arial";
+    ctx.fillText("Animales", 100, 200);
+    ctx.fillText("Frutas", 100, 300);
+    ctx.fillText("Paises", 100, 400);
+}
+
+function seleccionarCategoria(mx, my) {
+    // Lógica para detectar y seleccionar la categoría según el clic del usuario
+    // Aquí se comprueba si el clic se realizó dentro del área de alguna categoría y se actualiza la variable categoriaSeleccionada
+    if (mx >= 50 && mx <= 150 && my >= 80 && my <= 120) {
+        categoriaSeleccionada = "animales";
+        iniciarJuego();
+    } else if (mx >= 50 && mx <= 100 && my >= 130 && my <= 170) {
+        categoriaSeleccionada = "frutas";
+        iniciarJuego();
+    } else if (mx >= 50 && mx <= 100 && my >= 180 && my <= 220) {
+        categoriaSeleccionada = "paises";
+        iniciarJuego();
+    }
+}
+
+canvas.addEventListener('click', function(e) {
+    var mx = e.clientX - canvas.getBoundingClientRect().left;
+    var my = e.clientY - canvas.getBoundingClientRect().top;
+
+    // Verificar si el clic ocurrió en el área de las categorías
+    if (mx >= 50 && mx <= 200 && my >= 80 && my <= 220) {
+        seleccionarCategoria(mx, my);
+        teclas.click(mx,my);
+    }
+});
+
+function iniciarJuego() {
+    palabrasCategoria = categorias[categoriaSeleccionada];
+    palabraActual = palabrasCategoria[Math.floor(Math.random() * palabrasCategoria.length)];
+
+    // Reiniciar marcador o cualquier otra lógica adicional
+    reiniciarMarcador();
+}
+function reiniciarMarcador() {
+    // Reiniciar variables relacionadas con el marcador o el progreso del juego
+    numeroIntentos = 0; // Reiniciar el número de intentos
+    puntaje = 0; // Reiniciar el puntaje si aplica
+    // O cualquier otra variable que esté relacionada con el seguimiento del progreso del jugador
+    
+    // Actualizar la visualización del marcador en la interfaz gráfica si es necesario
+    actualizarInterfaz();
+}
+
+function actualizarInterfaz() {
+    // Código para actualizar la interfaz gráfica con los nuevos valores del marcador
+    // Por ejemplo, mostrar el número de intentos restantes, actualizar el puntaje en pantalla, etc.
+}
+
+
+
+// Define la información de los botones
+var botones = [
+    { x: 25, y: 25, ancho: 150, alto: 40, texto: 'Reiniciar juego', clic: false },
+    { x: 1200, y: 25, ancho: 120, alto: 40, texto: 'Categorias', clic: false }
+];
+
+
+
+// Función para dibujar los botones en el canvas
+function dibujarBotones(ctx) {
+    for (var i = 0; i < botones.length; i++) {
+        var boton = botones[i];
+
+        // Dibuja el botón
+        ctx.fillStyle = boton.clic ? '#00FF00' : '#FF0000';
+        ctx.fillRect(boton.x, boton.y, boton.ancho, boton.alto);
+
+        // Dibuja el texto en el botón
+        ctx.fillStyle = '#FFFFFF';
+        ctx.font = '20px Arial';
+        ctx.fillText(boton.texto, boton.x + 10, boton.y + 30);
+    }
+}
+
+// Función para detectar clics en los botones
+function detectarClic(event) {
+    var rect = canvas.getBoundingClientRect();
+    var mouseX = event.clientX - rect.left;
+    var mouseY = event.clientY - rect.top;
+
+    for (var i = 0; i < botones.length; i++) {
+        var boton = botones[i];
+
+        if (mouseX >= boton.x && mouseX <= boton.x + boton.ancho &&
+            mouseY >= boton.y && mouseY <= boton.y + boton.alto) {
+            // Se ha hecho clic en el botón
+            boton.clic = true;
+            console.log('Clic en ' + boton.texto);
+            // Aquí puedes agregar la lógica correspondiente al clic del botón
+            // Por ejemplo, llamar a una función relacionada con el botón clicado
+        }
+    }
+}
+
+
+
+
+var categorias = {
+    animales: ["COCODRILO", "GATO", "ELEFANTE", "LEON", "PERRO", "TIGRE", "JIRAFA", "OSO"],
+    frutas: ["MANZANA", "BANANA", "FRESA", "UVA", "NARANJA", "KIWI"],
+    paises: ["EEUU", "FRANCIA", "ALEMANIA", "JAPÓN", "BRASIL", "ITALIA"]
+};
+
+// Selecciona una categoría aleatoria
+var categoriasKeys = Object.keys(categorias);
+var categoriaSeleccionada = categoriasKeys[Math.floor(Math.random() * categoriasKeys.length)];
+
+// Selecciona una palabra aleatoria dentro de la categoría seleccionada
+var palabrasCategoria = categorias[categoriaSeleccionada];
+var palabraActual = palabrasCategoria[Math.floor(Math.random() * palabrasCategoria.length)];
+
+
+function app(ctx) {
+    var canvas = document.getElementById('canvas');
+    var ctx = canvas.getContext('2d');
+
+    var colorTecla = "#FF5A04";
+    var colorMargen = "yellow";
+    var inicioX = 20;
+    var lon = 35;
+    var margen = 10;
+    var letras = "ABCDEFGHIJKLMNÑOPQRSTUVWXYZ";
+    var teclas = []; // Arreglo para almacenar las teclas
+
+    var imagenCargada = false;
+    var inicioY = canvas.height - 100;
+
+    function Tecla(x, y, width, height, letra) {
+        this.x = x;
+        this.y = y;
+        this.width = width;
+        this.height = height;
+        this.letra = letra;
+        this.clicked = false; // Añadir una propiedad para detectar el clic
+
+        this.dibuja = function() {
+            ctx.fillStyle = colorTecla;
+            if (this.clicked) { // Si se hizo clic, pintar de color rojo
+                ctx.fillStyle = "red";
+            }
+            
+            ctx.strokeStyle = colorMargen;
+            ctx.fillRect(this.x, this.y, this.width, this.height);
+            ctx.strokeRect(this.x, this.y, this.width, this.height);
+
+            ctx.strokeStyle="#000"
+            ctx.font = "20px Arial";
+            ctx.fillText(this.letra, this.x + this.width / 2 - 5, this.y + this.height / 2 + 5);
+        
+            // Verificar si la letra de la tecla está en la palabra a adivinar
+           var isInWord = palabraActual.includes(this.letra);
+
+       if (this.clicked && isInWord) {
+           ctx.fillStyle = "green"; // Cambiar a verde solo cuando se hace clic
+           ctx.fillRect(this.x, this.y, this.width, this.height);
+           ctx.strokeRect(this.x, this.y, this.width, this.height);
+           ctx.fillStyle = "white";
+           ctx.fillText(this.letra, this.x + this.width / 2 - 5, this.y + this.height / 2 + 5);
+       }
+        };
+
+        this.click = function(mx, my) {
+            if (mx >= this.x && mx <= this.x + this.width &&
+                my >= this.y && my <= this.y + this.height)
+                {
+                 this.clicked = !this.clicked; // Cambiar el estado del clic
+                 if (this.clicked) {
+                    mostrarLetra(this.letra); // Llama a una función para mostrar la letra
+                } else {
+               //     borrarLetra(this.letra); // Llama a una función para borrar la letra
+                }
+               
+                 this.dibuja(); // Volver a dibujar la tecla
+                 }
+
+        };
+    }
+
+ function mostrarLetra(letra) {
+    // Verificar si la letra está en la palabra a adivinar
+    var indices = [];
+    for (var i = 0; i < palabraActual.length; i++) {
+        if (palabraActual[i] === letra) {
+            indices.push(i);
+        }
+    }
+
+    // Si la letra está en la palabra, dibujarla en la línea correspondiente
+    if (indices.length > 0) {
+        var lineLength = 30; // Longitud de cada línea
+        var lineSpacing = 10; // Espacio entre las líneas
+        var inicioX = canvas.width / 2 - (palabraActual.length * (lineLength + lineSpacing) - lineSpacing) / 2; // Inicio X para centrar las líneas
+        var inicioY = canvas.height / 2; // Posición Y centrada (ajusta según tu preferencia)
+
+        ctx.fillStyle = "black"; // Color de la letra
+        ctx.font = "35px Arial"; // Tamaño y tipo de letra
+
+        // Dibuja la letra en cada línea correspondiente
+        for (var j = 0; j < indices.length; j++) {
+            var posX = inicioX + indices[j] * (lineLength + lineSpacing) + (lineLength / 2) - (ctx.measureText(letra).width / 2); // Calcula la posición X centrada
+            var posY = inicioY + 15; // Posición Y centrada (ajusta según tu preferencia)
+
+            ctx.fillText(letra, posX, posY); // Dibuja la letra en la línea
+     
+       // Incrementar el contador y actualizar la visualización si la letra se pinta de verde
+       if (ctx.fillStyle === "green") {
+        letrasAdivinadas++;
+        mostrarConteo();
+    }
+        }
+    }
+ }
+        const jake = {
+
+        escenario: function() {
+            var imagen = new Image();
+            imagen.src = "img/fondo.jpg";
+
+            imagen.onload = function() {
+                ctx.drawImage(imagen, 0, 0, canvas.width, canvas.height);
+                imagenCargada = true;
+               
+                // muestra el teclado  funcional y dibuja las lineas
+                mostrarCategorias(ctx); // Llamar la función pasando ctx como argumento     
+               
+                jake.teclado();
+                dibujarLineasCentro(ctx, canvas, palabraActual);
+               // Llama a la función para dibujar los botones
+                dibujarBotones(ctx);
+               //nueva orden tratanto de dibujar las categorias 
+               //mostrarCategorias(ctx); // Mostrar categorías primero
+               //dibujarLineasCentro(ctx, canvas, palabraActual);
+               //jake.teclado();
+               
+            
+            };
+         //  dibujarLineasCentro(ctx, canvas, palabraActual);
+           
+        },
+
+
+
+
+        teclado: function() {
+            if (imagenCargada) {
+                var ren = 0;
+                var col = 0;
+                var letra = "";
+                var miLetra;
+                for (var i = 0; i < letras.length; i++) {
+                    letra = letras.charAt(i);
+                    miLetra = new Tecla(inicioX + col * (lon + margen), inicioY + ren * (lon + margen), lon, lon, letra);
+                    miLetra.dibuja();
+                    teclas.push(miLetra); // Agregar la tecla al arreglo
+                    col++;
+                    if (col == 9) {
+                        col = 0;
+                        ren++;
+                    }
+                }
+            }
+        },
+
+
+
+        play: function(ctx) {
+           
+            this.escenario(ctx);
+            this.teclado();
+        }
+    };
+
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    window.onload = function() {
+        jake.play();
+    };
+
+    window.onresize = function() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        inicioY = canvas.height - 100;
+        jake.play();
+    };
+
+    canvas.addEventListener('click', function(e) {
+        var mx = e.clientX - canvas.getBoundingClientRect().left;
+        var my = e.clientY - canvas.getBoundingClientRect().top;
+
+        for (var i = 0; i < teclas.length; i++) {
+            teclas[i].click(mx, my); // Verificar el clic en cada tecla
+        }
+    });
+
+
+    
+
+
+
+    // Agregar un listener al canvas para detectar clics
+    canvas.addEventListener('click', detectarClic);
+
+
+
+
+
+ }
+
+ function dibujarEspacios(ctx, palabra) {
+    var espacioEntreLetras = 20; // Espacio horizontal entre las letras
+    var anchoContenedor = 30; // Ancho del contenedor de cada letra
+    var altoContenedor = 40; // Alto del contenedor de cada letra
+
+    var totalAnchoPalabra = palabra.length * (anchoContenedor + espacioEntreLetras) - espacioEntreLetras; // Ancho total de la palabra dibujada
+
+    var inicioX = (canvas.width - totalAnchoPalabra) / 2; // Calcula el inicio X para centrar las letras
+    var inicioY = 200; // Posición Y para dibujar los espacios
+
+    // Iterar sobre cada letra de la palabra
+    for (var i = 0; i < palabra.length; i++) {
+        // Dibujar un rectángulo que servirá como contenedor para cada letra
+        ctx.fillRect(inicioX + i * (anchoContenedor + espacioEntreLetras), inicioY, anchoContenedor, altoContenedor);
+        ctx.strokeRect(inicioX + i * (anchoContenedor + espacioEntreLetras), inicioY, anchoContenedor, altoContenedor);
+    }
+ }
+ function dibujarLineasCentro(ctx, canvas, palabraActual) {
+    var centerX = canvas.width / 2; // Coordenada X del centro de la pantalla
+    var centerY = canvas.height / 2; // Coordenada Y del centro de la pantalla
+    var lineLength = 30; // Longitud de cada línea
+    var lineSpacing = 10; // Espacio entre las líneas
+
+    // Calcula las coordenadas de las líneas en fila según la longitud de la palabra
+    var palabraLength = palabraActual.length; // Longitud de la palabra actual
+    var totalWidth = palabraLength * lineLength + (palabraLength - 1) * lineSpacing; // Ancho total de las líneas
+    var startX = centerX - totalWidth / 2; // Coordenada X inicial
+    var startY = centerY - lineLength / 2 +35; // Posición Y centrada (ajustada hacia arriba)
+
+    // Dibuja las líneas en fila en el centro del lienzo según la longitud de la palabra
+    ctx.strokeStyle = "blue"; // Color de la línea
+    ctx.lineWidth = 4; // Ancho de la línea
+    for (var i = 0; i < palabraLength; i++) {
+        ctx.beginPath();
+        ctx.moveTo(startX + i * (lineLength + lineSpacing), startY);
+        ctx.lineTo(startX + i * (lineLength + lineSpacing) + lineLength, startY);
+        ctx.stroke();
+    }
+
+
+  window.onload = function() {
+
+    //const canvas = document.getElementById('canvas');
+    //const ctx = canvas.getContext('2d'); 
+
+    jake.play(ctx); // Mostrar las categorías cuando la ventana se cargue
+    // Otro código relacionado con la aplicación
+ };
+
+
+}//esta llave cierra funtion app();
+
+//Con esto me ayuda a coordinar las letras y las lineas  app(ctx)
+document.addEventListener('DOMContentLoaded', function() {
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    app(ctx);
+});

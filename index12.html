@@ -1,0 +1,101 @@
+function app() {
+    // Obtén el canvas y el contexto
+    var canvas = document.getElementById('canvas');
+    var ctx = canvas.getContext('2d');
+
+    // Definición de variables
+    var colorTecla = "#FF5A04";
+    var colorMargen = "yellow";
+    var inicioX = 20;
+    var lon = 35;
+    var margen = 10;
+    var letras = "ABCDEFGHIJKLMNÑOPQRSTUVWXYZ";
+
+    // Bandera para verificar si la imagen está cargada
+    var imagenCargada = false;
+
+    // Calcula la posición inicial Y para centrar el teclado en la parte inferior
+    var inicioY = canvas.height - 100;
+
+    // Definición de la clase Tecla
+    function Tecla(x, y, width, height, letra) {
+        this.x = x;
+        this.y = y;
+        this.width = width;
+        this.height = height;
+        this.letra = letra;
+
+        this.dibuja = function() {
+            // Dibuja la tecla en el canvas
+            ctx.fillStyle = colorTecla;
+            ctx.strokeStyle = colorMargen;
+            ctx.fillRect(this.x, this.y, this.width, this.height);
+            ctx.strokeRect(this.x, this.y, this.width, this.height);
+
+            // Agrega el texto de la letra al centro de la tecla
+            ctx.fillStyle = "white";
+            ctx.font = "20px Arial";
+            ctx.fillText(this.letra, this.x + this.width / 2 - 5, this.y + this.height / 2 + 5);
+        };
+    }
+
+    const jake = {
+        escenario: function() {
+            // Crea una nueva instancia de la imagen
+            var imagen = new Image();
+
+            // Asigna la ruta correcta de la imagen
+            imagen.src = "img/fondo.jpg";
+
+            // Espera a que la imagen se cargue antes de dibujarla en el canvas
+            imagen.onload = function() {
+                // Dibuja la imagen en el canvas para que ocupe toda la pantalla
+                ctx.drawImage(imagen, 0, 0, canvas.width, canvas.height);
+                // Marca la bandera como verdadera
+                imagenCargada = true;
+                // Dibuja el teclado después de cargar la imagen
+                jake.teclado();
+            };
+        },
+
+        teclado: function() {
+            // Verifica si la imagen está cargada antes de dibujar el teclado
+            if (imagenCargada) {
+                // Modificar la posición inicial Y para reubicar el teclado
+                var nuevaY = 500; // Cambiar este valor según tu preferencia
+                var ren = 0;
+                var col = 0;
+                var letra = "";
+                var miLetra;
+                for (var i = 0; i < letras.length; i++) {
+                    letra = letras.charAt(i);
+                    miLetra = new Tecla(inicioX + col * (lon + margen), nuevaY + ren * (lon + margen), lon, lon, letra);
+                    miLetra.dibuja();
+                    col++;
+                    if (col == 9) {
+                        col = 0;
+                        ren++;
+                    }
+                }
+            }
+        },
+
+        
+        play: function() {
+            // Llama a las funciones para configurar el escenario y dibujar el teclado
+            this.escenario();
+        }
+    };
+
+    
+
+    // Espera a que la ventana se cargue antes de ejecutar la función play
+    window.onload = function() {
+        jake.play();
+    };
+
+
+}
+
+// Llama a la función app para iniciar la aplicación
+app();

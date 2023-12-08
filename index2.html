@@ -1,0 +1,178 @@
+//Nota: ya muestra el teclado, pinta el teclado,  muestra la palabra  
+
+
+//vareable global
+var palabraActual = "ANIMALES";
+
+function app() {
+    var canvas = document.getElementById('canvas');
+    var ctx = canvas.getContext('2d');
+
+    var colorTecla = "#FF5A04";
+    var colorMargen = "yellow";
+    var inicioX = 20;
+    var lon = 35;
+    var margen = 10;
+    var letras = "ABCDEFGHIJKLMNÑOPQRSTUVWXYZ";
+    var teclas = []; // Arreglo para almacenar las teclas
+
+    var imagenCargada = false;
+    var inicioY = canvas.height - 100;
+
+    function Tecla(x, y, width, height, letra) {
+        this.x = x;
+        this.y = y;
+        this.width = width;
+        this.height = height;
+        this.letra = letra;
+        this.clicked = false; // Añadir una propiedad para detectar el clic
+
+        this.dibuja = function() {
+            ctx.fillStyle = colorTecla;
+            if (this.clicked) { // Si se hizo clic, pintar de color amarillo
+                ctx.fillStyle = colorMargen;
+            }
+            ctx.strokeStyle = colorMargen;
+            ctx.fillRect(this.x, this.y, this.width, this.height);
+            ctx.strokeRect(this.x, this.y, this.width, this.height);
+
+            ctx.fillStyle = "white";
+            ctx.font = "20px Arial";
+            ctx.fillText(this.letra, this.x + this.width / 2 - 5, this.y + this.height / 2 + 5);
+        };
+
+        this.click = function(mx, my) {
+            if (mx >= this.x && mx <= this.x + this.width &&
+                my >= this.y && my <= this.y + this.height)
+                {
+                 this.clicked = !this.clicked; // Cambiar el estado del clic
+                 if (this.clicked) {
+                    mostrarLetra(this.letra); // Llama a una función para mostrar la letra
+                } else {
+                    borrarLetra(this.letra); // Llama a una función para borrar la letra
+                }
+               
+                 this.dibuja(); // Volver a dibujar la tecla
+                 }
+
+        };
+    }
+    function mostrarLetra(letra) {
+        var espacioEntreLetras = 80;
+        // Verificar si la letra está en la palabra a adivinar
+        var index = palabraActual.indexOf(letra);
+        
+        // Si la letra está en la palabra, index será mayor o igual a cero
+        if (index >= 0) {
+            // Calcular la posición X en el canvas donde se dibujará la letra
+            var posX = inicioX + index * espacioEntreLetras + 10;
+            
+            // Calcular la posición Y en el canvas donde se dibujará la letra
+            var posY = 200 + 20; // Esto es un ejemplo, debes ajustar la posición Y según tu diseño
+            
+            // Dibujar la letra en el canvas
+            ctx.fillStyle = "black";
+            ctx.font = "80px Arial";
+            ctx.fillText(letra, posX, posY);
+        }
+    }
+
+
+
+        const jake = {
+        escenario: function() {
+            var imagen = new Image();
+            imagen.src = "img/fondo.jpg";
+
+            imagen.onload = function() {
+                ctx.drawImage(imagen, 0, 0, canvas.width, canvas.height);
+                imagenCargada = true;
+                jake.teclado();
+            };
+        
+            jake.teclado();
+
+            // Dibujar espacios para las letras de la palabra
+            //var palabraActual = "ANIMALES"; // Aquí debes colocar tu palabra actual
+            dibujarEspacios(palabraActual);
+        },
+
+
+
+
+        teclado: function() {
+            if (imagenCargada) {
+                var ren = 0;
+                var col = 0;
+                var letra = "";
+                var miLetra;
+                for (var i = 0; i < letras.length; i++) {
+                    letra = letras.charAt(i);
+                    miLetra = new Tecla(inicioX + col * (lon + margen), inicioY + ren * (lon + margen), lon, lon, letra);
+                    miLetra.dibuja();
+                    teclas.push(miLetra); // Agregar la tecla al arreglo
+                    col++;
+                    if (col == 9) {
+                        col = 0;
+                        ren++;
+                    }
+                }
+            }
+        },
+
+//dibuja los espacios o contenedores de la palabra a adivinar 
+
+
+
+        play: function() {
+            this.escenario();
+        }
+    };
+
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    window.onload = function() {
+        jake.play();
+    };
+
+    window.onresize = function() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        inicioY = canvas.height - 100;
+        jake.play();
+    };
+
+    canvas.addEventListener('click', function(e) {
+        var mx = e.clientX - canvas.getBoundingClientRect().left;
+        var my = e.clientY - canvas.getBoundingClientRect().top;
+
+        for (var i = 0; i < teclas.length; i++) {
+            teclas[i].click(mx, my); // Verificar el clic en cada tecla
+        }
+    });
+
+}
+function dibujarEspacios(palabra) {
+    var espacioEntreLetras = 40; // Espacio horizontal entre las letras
+    var anchoContenedor = 30; // Ancho del contenedor de cada letra
+    var altoContenedor = 40; // Alto del contenedor de cada letra
+
+    var totalAnchoPalabra = palabra.length * espacioEntreLetras; // Ancho total de la palabra dibujada
+
+    var inicioX = (canvas.width - totalAnchoPalabra) / 2; // Calcula el inicio X para centrar las letras
+    var inicioY = 200; // Posición Y para dibujar los espacios
+
+    ctx.fillStyle = "#000000"; // Color del contenedor de la letra
+    ctx.strokeStyle = "black"; // Color del borde del contenedor
+
+    // Iterar sobre cada letra de la palabra
+    for (var i = 0; i < palabra.length; i++) {
+        // Dibujar un rectángulo que servirá como contenedor para cada letra
+        ctx.fillRect(inicioX + i * espacioEntreLetras, inicioY, anchoContenedor, altoContenedor);
+        ctx.strokeRect(inicioX + i * espacioEntreLetras, inicioY, anchoContenedor, altoContenedor);
+    }
+}
+
+
+app();
